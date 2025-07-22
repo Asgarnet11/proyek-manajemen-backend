@@ -77,4 +77,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ProjectDocument::class, 'uploaded_by');
     }
+
+    public function createdProgressUpdates()
+    {
+        return $this->hasMany(ProgressUpdate::class, 'created_by');
+    }
 }

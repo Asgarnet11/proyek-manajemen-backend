@@ -62,4 +62,9 @@ class Project extends Model
     {
         return $this->hasMany(ProjectDocument::class);
     }
+
+    public function progressUpdates()
+    {
+        return $this->hasMany(ProgressUpdate::class);
+    }
 }

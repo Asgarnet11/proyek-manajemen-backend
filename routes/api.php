@@ -4,7 +4,9 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CalendarEventController;
 use App\Http\Controllers\Api\CostController;
 use App\Http\Controllers\Api\HseReportController;
+use App\Http\Controllers\Api\ProgressUpdateController;
 use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\ProjectDocumentController;
 use App\Http\Controllers\Api\QualityCheckController;
 use App\Http\Controllers\Api\TaskController;
 use Illuminate\Http\Request;
@@ -44,9 +46,27 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/quality-checks/{qualityCheck}/approve', [QualityCheckController::class, 'approve']);
     });
 
-    Route::middleware('role:HSE Officer,Supervisor,Manajer Proyek')->group(function () {
+    Route::middleware('role:hse_officer,supervisor,manajer_proyek')->group(function () {
         Route::apiResource('projects.hse-reports', HseReportController::class)->shallow();
     });
 
     Route::apiResource('projects.calendar-events', CalendarEventController::class)->shallow();
+    // 
+    Route::get('/projects/{project}/documents', [ProjectDocumentController::class, 'index']);
+    Route::post('/projects/{project}/documents', [ProjectDocumentController::class, 'store']);
+
+    Route::middleware('role:admin,supervisor')->group(function () {
+        Route::delete('/documents/{projectDocument}', [ProjectDocumentController::class, 'destroy']);
+    });
+
+    // === GROUP ROUTE UNTUK PROGRESS UPDATE ===
+    Route::middleware('role:"manajer_proyek",supervisor,client')->group(function () {
+        Route::get('/projects/{project}/progress-updates', [ProgressUpdateController::class, 'index']);
+        Route::get('/progress-updates/{progress_update}', [ProgressUpdateController::class, 'show']);
+    });
+
+    Route::middleware('role:"manajer_proyek",supervisor')->group(function () {
+        Route::post('/projects/{project}/progress-updates', [ProgressUpdateController::class, 'store']);
+        Route::delete('/progress-updates/{progress_update}', [ProgressUpdateController::class, 'destroy']);
+    });
 });
